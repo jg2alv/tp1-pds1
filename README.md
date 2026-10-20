@@ -7,7 +7,7 @@ Sort Trek ranks solar systems for exploration using six ordered comparison crite
 - **Institution:** Universidade Federal de Minas Gerais (UFMG)
 - **Degree:** Ciência da Computação
 - **Course:** Programação e Desenvolvimento de Software I
-- **Assignment:** TP1
+- **Assignment:** Trabalho Prático 1
 - **Semester:** 2023-02
 
 The project connects introductory C programming with a sorting problem whose comparison key depends on nested data. The delivered implementation contains the file parser, dynamically allocated record structures, metric helpers, a comparator, and a recursive partition-based sorting routine.
