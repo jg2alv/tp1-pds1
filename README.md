@@ -1,4 +1,4 @@
-# Sort Trek — Multi-criteria ranking of hierarchical astronomical records in C
+# Sort Trek: Multi-criteria ranking of hierarchical astronomical records in C
 
 Sort Trek ranks solar systems for exploration using six ordered comparison criteria. A command-line program reads systems, planets, and moons from a hierarchical input file, then sorts system records in place and prints their names in priority order.
 
