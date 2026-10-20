@@ -1,131 +1,57 @@
-# Ordenação de Sistemas Solares
+# Sort Trek — Multi-criteria ranking of hierarchical astronomical records in C
 
-Programa de linha de comando desenvolvido em C que lê dados astronômicos hierárquicos e classifica sistemas solares de acordo com uma sequência de critérios de comparação.
+Sort Trek ranks solar systems for exploration using six ordered comparison criteria. A command-line program reads systems, planets, and moons from a hierarchical input file, then sorts system records in place and prints their names in priority order.
 
-Este projeto foi desenvolvido individualmente para a disciplina **Programação e Desenvolvimento de Software I (PDS1)** da **Universidade Federal de Minas Gerais**, durante o segundo semestre de 2023.
+## 1. Academic context and scope
 
-## Visão geral
+- **Institution:** Universidade Federal de Minas Gerais (UFMG)
+- **Degree:** Ciência da Computação
+- **Course:** Programação e Desenvolvimento de Software I
+- **Assignment:** TP1
+- **Semester:** 2023-02
 
-Cada sistema solar contém informações sobre sua estrela, seus planetas e suas luas. O programa processa essa estrutura hierárquica e ordena os sistemas do mais interessante para o menos interessante.
+The project connects introductory C programming with a sorting problem whose comparison key depends on nested data. The delivered implementation contains the file parser, dynamically allocated record structures, metric helpers, a comparator, and a recursive partition-based sorting routine.
 
-A classificação segue estes critérios, em ordem:
+Systems are prioritized by larger stellar radius, more planets, larger maximum planetary radius, more moons in total, larger maximum lunar radius, and finally earlier discovery time. Each criterion breaks ties left by the preceding criteria.
 
-1. Maior raio da estrela
-2. Maior quantidade de planetas
-3. Maior raio de planeta
-4. Maior quantidade total de luas
-5. Maior raio de lua
-6. Menor tempo de descoberta
+## 2. How to run
 
-Cada critério funciona como desempate para o critério anterior.
+Prerequisite: a C compiler. The repository's entrypoint is [main.c](main.c); run compilation from the repository root:
 
-## Implementação
+```sh
+gcc -std=c11 -Wall -Wextra -pedantic main.c -o sort-trek
+```
 
-O projeto utiliza estruturas aninhadas em C para representar sistemas solares, planetas e luas:
+The executable reads an input-file path from standard input. It then opens that file to read the astronomical records; the records themselves are not read directly from standard input.
 
-- `Sistema` armazena o nome do sistema, o tempo de descoberta, o raio da estrela e seus planetas.
-- `Planeta` armazena o nome do planeta, seu raio e suas luas.
-- `Lua` armazena o nome da lua e seu raio.
+## 3. Usage example
 
-A implementação também inclui:
+The versioned [first input fixture](entradas/case-1) contains three systems:
 
-- Alocação dinâmica de memória para os dados hierárquicos
-- Leitura de dados a partir de arquivos
-- Função de comparação com múltiplos critérios
-- Funções auxiliares para o cálculo de métricas planetárias e lunares
-- Algoritmo recursivo de ordenação in-place inspirado no Quicksort
-- Rotina de particionamento baseada no último elemento de cada intervalo
+```sh
+printf '%s\n' entradas/case-1 | ./sort-trek
+```
 
-As rotinas de ordenação e particionamento são denominadas `bromerosort` e `ritacao`, seguindo a terminologia utilizada no enunciado original do trabalho.
-
-## Formato da entrada
-
-O executável recebe inicialmente, por meio da entrada padrão, o caminho para o arquivo que será processado.
-
-O arquivo indicado deve seguir esta estrutura hierárquica:
+Its [expected-output fixture](saidas/case-1) contains:
 
 ```text
-N
-
-T S R P
-
-p r L
-
-l q
+UeoFP
+CVUdc
+w4a52L3
 ```
 
-Em que:
+The order follows descending stellar radius for this case. This is the stored reference output; it was not regenerated for this README.
 
-- `N` é a quantidade de sistemas solares.
-- `T` é o tempo de descoberta do sistema.
-- `S` é o nome do sistema.
-- `R` é o raio de sua estrela.
-- `P` é a quantidade de planetas do sistema.
-- `p` é o nome de um planeta.
-- `r` é o raio do planeta.
-- `L` é a quantidade de luas associadas ao planeta.
-- `l` é o nome de uma lua.
-- `q` é o raio da lua.
+## 4. Implementation decisions
 
-O registro de planeta é repetido `P` vezes para cada sistema, enquanto o registro de lua é repetido `L` vezes para cada planeta.
+- **Nested records:** `Sistema`, `Planeta`, and `Lua` preserve the hierarchy rather than flattening all astronomical objects into one table.
+- **Central comparison rule:** `sistcmp` applies the six criteria in one place. Helpers traverse the nested records to compute planetary and lunar metrics during comparisons.
+- **In-place partitioning:** `bromerosort` recursively partitions around the last record in an interval through `ritacao`. Swapping system structures moves their pointers without copying each planet or moon allocation.
 
-O enunciado admite:
+## 5. Tests and evaluation
 
-- Até 1.000.000 de sistemas solares
-- Até 100 planetas por sistema
-- Até 100 luas por planeta
-- Nomes com até 100 caracteres
+The [input fixtures](entradas) and [reference outputs](saidas) provide concrete ranking cases.
 
-## Saída
+## 6. Learning
 
-O programa escreve o nome de um sistema solar por linha, ordenando-os do sistema mais interessante para o menos interessante.
-
-```text
-SistemaMaisInteressante
-SegundoSistemaMaisInteressante
-SistemaMenosInteressante
-```
-
-## Compilação
-
-É necessário possuir um compilador C, como GCC ou Clang.
-
-Utilizando GCC:
-
-```bash
-gcc -std=c11 -Wall -Wextra -pedantic main.c -o ordenacao-sistemas-solares
-```
-
-Utilizando Clang:
-
-```bash
-clang -std=c11 -Wall -Wextra -pedantic main.c -o ordenacao-sistemas-solares
-```
-
-## Execução
-
-Passe o caminho do arquivo de entrada para o programa por meio da entrada padrão:
-
-```bash
-echo "caminho/para/o/arquivo-de-entrada" | ./ordenacao-sistemas-solares
-```
-
-Também é possível executar o programa e, em seguida, digitar o caminho do arquivo:
-
-```bash
-./ordenacao-sistemas-solares
-```
-
-O repositório inclui arquivos compactados contendo casos de entrada e suas respectivas saídas esperadas.
-
-## Contexto acadêmico
-
-Este projeto explora conceitos fundamentais da programação em C, incluindo:
-
-- Estruturas e modelos de dados aninhados
-- Ponteiros
-- Alocação dinâmica de memória
-- Manipulação de arquivos
-- Recursão
-- Funções de comparação personalizadas
-- Algoritmos de ordenação in-place
+The work develops the relationship between hierarchical data modeling, pointer ownership, and recursive sorting. Recomputing nested metrics during comparisons also makes the cost of a comparison relevant to overall sorting cost.
